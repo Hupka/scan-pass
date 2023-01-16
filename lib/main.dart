@@ -3,6 +3,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:wakelock/wakelock.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -34,12 +35,14 @@ class _MyAppState extends State<MyApp> {
       _changeNumber();
     });
     super.initState();
+    Wakelock.enable();
     _changeNumber();
   }
 
   @override
   void dispose() {
     _timer.cancel();
+    Wakelock.disable();
     super.dispose();
   }
 
