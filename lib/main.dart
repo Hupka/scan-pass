@@ -18,13 +18,13 @@ class _MyAppState extends State<MyApp> {
   int _number = 0;
   Color _backgroundColor = Colors.blue;
   bool _isMonochrome = false;
-  bool _isSimple = false;
-  int _changeFrequency = 5; // 5 seconds as default
+  bool _isSimple = true;
+  int _changeFrequency = 3; // 3 seconds as default
   late Timer _timer;
 
   @override
   void initState() {
-    _timer = Timer.periodic(Duration(seconds: 5), (_) {
+    _timer = Timer.periodic(Duration(seconds: _changeFrequency), (_) {
       _changeNumber();
     });
     super.initState();
@@ -92,7 +92,12 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     var screenSize = MediaQuery.of(context).size;
-    var textSize = screenSize.height * 0.9;
+    double textSize;
+    if (MediaQuery.of(context).orientation == Orientation.portrait) {
+      textSize = screenSize.width * 0.75;
+    } else {
+      textSize = screenSize.height * 0.9;
+    }
     return Stack(
       children: <Widget>[
         Container(
