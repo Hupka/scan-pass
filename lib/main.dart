@@ -102,14 +102,23 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     var screenSize = MediaQuery.of(context).size;
     double iconSize;
+    double insetSize;
     double textSize;
+    double buttonBorder;
     if (MediaQuery.of(context).orientation == Orientation.portrait) {
       textSize = screenSize.width * 0.75;
       iconSize = screenSize.width * 0.05;
+      insetSize = iconSize * 3 / 4;
+      buttonBorder = screenSize.width * 0.004;
     } else {
       textSize = screenSize.height * 0.9;
       iconSize = screenSize.height * 0.05;
+      insetSize = iconSize * 3 / 4;
+      buttonBorder = screenSize.height * 0.004;
     }
+
+    insetSize = insetSize < 28 ? 28 : insetSize;
+
     return Stack(
       children: <Widget>[
         Container(
@@ -128,8 +137,8 @@ class _MyAppState extends State<MyApp> {
           ),
         ),
         Positioned(
-          top: 28,
-          right: 28,
+          top: insetSize,
+          right: insetSize,
           child: GestureDetector(
             onTap: _toggleMonochrome,
             child: Icon(
@@ -140,8 +149,8 @@ class _MyAppState extends State<MyApp> {
           ),
         ),
         Positioned(
-          bottom: 28,
-          right: 28,
+          bottom: insetSize,
+          right: insetSize,
           child: GestureDetector(
             onTap: _toggleSimple,
             child: Icon(_isSimple ? Icons.filter_1 : Icons.filter_9_plus,
@@ -150,8 +159,8 @@ class _MyAppState extends State<MyApp> {
           ),
         ),
         Positioned(
-          bottom: 28,
-          left: 28,
+          bottom: insetSize,
+          left: insetSize,
           child: GestureDetector(
             onTap: () => _changeFrequencyCycle(_changeFrequency),
             child: Container(
@@ -161,33 +170,41 @@ class _MyAppState extends State<MyApp> {
                 shape: BoxShape.circle,
                 border: Border.all(
                   color: _isMonochrome ? Colors.white : Colors.black,
-                  width: 3,
+                  width: buttonBorder,
                 ),
               ),
               child: Center(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    Text(
-                      '$_changeFrequency',
-                      style: TextStyle(
-                          color: _isMonochrome ? Colors.white : Colors.black,
-                          fontWeight: FontWeight.w900,
-                          fontSize: 16,
-                          fontFamily: 'Arial',
-                          inherit: false),
-                    ),
-                    const SizedBox(width: 2),
-                    Text(
-                      's',
-                      style: TextStyle(
-                          color: _isMonochrome ? Colors.white : Colors.black,
-                          fontWeight: FontWeight.w900,
-                          fontSize: 16,
-                          fontFamily: 'Arial',
-                          inherit: false),
-                    ),
-                  ],
+                child: LayoutBuilder(
+                  builder: (BuildContext context, BoxConstraints constraints) {
+                    final fontSize = constraints.maxHeight /
+                        2; // adjust the font size as desired
+                    return Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        Text(
+                          '$_changeFrequency',
+                          style: TextStyle(
+                              color:
+                                  _isMonochrome ? Colors.white : Colors.black,
+                              fontWeight: FontWeight.w900,
+                              fontSize: fontSize,
+                              fontFamily: 'Arial',
+                              inherit: false),
+                        ),
+                        const SizedBox(width: 2),
+                        Text(
+                          's',
+                          style: TextStyle(
+                              color:
+                                  _isMonochrome ? Colors.white : Colors.black,
+                              fontWeight: FontWeight.w900,
+                              fontSize: fontSize,
+                              fontFamily: 'Arial',
+                              inherit: false),
+                        ),
+                      ],
+                    );
+                  },
                 ),
               ),
             ),
