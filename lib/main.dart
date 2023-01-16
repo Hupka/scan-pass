@@ -2,9 +2,15 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+  SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: [
+    SystemUiOverlay.bottom, //This line is used for showing the bottom bar
+  ]);
   runApp(MaterialApp(
+    debugShowCheckedModeBanner: false,
     home: MyApp(),
   ));
 }
@@ -92,11 +98,14 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     var screenSize = MediaQuery.of(context).size;
+    double iconSize;
     double textSize;
     if (MediaQuery.of(context).orientation == Orientation.portrait) {
       textSize = screenSize.width * 0.75;
+      iconSize = screenSize.width * 0.05;
     } else {
       textSize = screenSize.height * 0.9;
+      iconSize = screenSize.height * 0.05;
     }
     return Stack(
       children: <Widget>[
@@ -116,34 +125,35 @@ class _MyAppState extends State<MyApp> {
           ),
         ),
         Positioned(
-          top: 20,
-          right: 20,
+          top: 28,
+          right: 28,
           child: GestureDetector(
             onTap: _toggleMonochrome,
             child: Icon(
               _isMonochrome ? Icons.wb_sunny : Icons.brightness_3,
               color: _isMonochrome ? Colors.white : Colors.black,
-              size: 40.0,
+              size: iconSize,
             ),
           ),
         ),
         Positioned(
-          bottom: 20,
-          right: 20,
+          bottom: 28,
+          right: 28,
           child: GestureDetector(
             onTap: _toggleSimple,
             child: Icon(_isSimple ? Icons.filter_1 : Icons.filter_9_plus,
-                color: _isMonochrome ? Colors.white : Colors.black, size: 40.0),
+                color: _isMonochrome ? Colors.white : Colors.black,
+                size: iconSize),
           ),
         ),
         Positioned(
-          bottom: 20,
-          left: 20,
+          bottom: 28,
+          left: 28,
           child: GestureDetector(
             onTap: () => _changeFrequencyCycle(_changeFrequency),
             child: Container(
-              width: 40,
-              height: 40,
+              width: iconSize,
+              height: iconSize,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 border: Border.all(
