@@ -23,7 +23,7 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   int _number = 0;
-  Color _backgroundColor = Colors.blue;
+  Color _backgroundColor = Colors.black;
   bool _isMonochrome = false;
   bool _isSimple = true;
   int _changeFrequency = 3; // 3 seconds as default
