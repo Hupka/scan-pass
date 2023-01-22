@@ -27,6 +27,7 @@ class _MyAppState extends State<MyApp> {
   bool _isMonochrome = false;
   bool _isSimple = true;
   int _changeFrequency = 3; // 3 seconds as default
+  bool _isColorOnly = false;
   late Timer _timer;
 
   @override
@@ -47,13 +48,10 @@ class _MyAppState extends State<MyApp> {
   }
 
   final List<Color> _colors = [
-    Colors.red,
+    Colors.red.shade800,
     Colors.green,
-    Colors.blue,
-    Colors.yellow,
-    Colors.orange,
-    Colors.purple,
-    Colors.pink,
+    Colors.blue.shade800,
+    Colors.amber,
   ];
 
   void _changeNumber() {
@@ -98,6 +96,13 @@ class _MyAppState extends State<MyApp> {
     _changeNumber(); // call _changeNumber method after toggling the mode
   }
 
+  void _toggleColorOnly() {
+    setState(() {
+      _isColorOnly = !_isColorOnly;
+    });
+    _changeNumber();
+  }
+
   @override
   Widget build(BuildContext context) {
     var screenSize = MediaQuery.of(context).size;
@@ -122,18 +127,27 @@ class _MyAppState extends State<MyApp> {
     return Stack(
       children: <Widget>[
         Container(
-          color: _backgroundColor,
+          color: _isColorOnly ? Colors.black : _backgroundColor,
           child: Center(
-            child: Text(
-              '$_number',
-              style: TextStyle(
-                fontSize: textSize,
-                color: _isMonochrome ? Colors.white : Colors.black,
-                fontWeight: FontWeight.bold,
-                fontFamily: 'Arial',
-                inherit: false,
-              ),
-            ),
+            child: _isColorOnly
+                ? Container(
+                    width: textSize,
+                    height: textSize,
+                    decoration: BoxDecoration(
+                      color: _backgroundColor,
+                      shape: BoxShape.circle,
+                    ),
+                  )
+                : Text(
+                    '$_number',
+                    style: TextStyle(
+                      fontSize: textSize,
+                      color: _isMonochrome ? Colors.white : Colors.black,
+                      fontWeight: FontWeight.bold,
+                      fontFamily: 'Arial',
+                      inherit: false,
+                    ),
+                  ),
           ),
         ),
         Positioned(
@@ -169,7 +183,9 @@ class _MyAppState extends State<MyApp> {
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 border: Border.all(
-                  color: _isMonochrome ? Colors.white : Colors.black,
+                  color: _isMonochrome || _isColorOnly
+                      ? Colors.white
+                      : Colors.black,
                   width: buttonBorder,
                 ),
               ),
@@ -184,8 +200,9 @@ class _MyAppState extends State<MyApp> {
                         Text(
                           '$_changeFrequency',
                           style: TextStyle(
-                              color:
-                                  _isMonochrome ? Colors.white : Colors.black,
+                              color: _isMonochrome || _isColorOnly
+                                  ? Colors.white
+                                  : Colors.black,
                               fontWeight: FontWeight.w900,
                               fontSize: fontSize,
                               fontFamily: 'Arial',
@@ -195,8 +212,9 @@ class _MyAppState extends State<MyApp> {
                         Text(
                           's',
                           style: TextStyle(
-                              color:
-                                  _isMonochrome ? Colors.white : Colors.black,
+                              color: _isMonochrome || _isColorOnly
+                                  ? Colors.white
+                                  : Colors.black,
                               fontWeight: FontWeight.w900,
                               fontSize: fontSize,
                               fontFamily: 'Arial',
@@ -206,6 +224,29 @@ class _MyAppState extends State<MyApp> {
                     );
                   },
                 ),
+              ),
+            ),
+          ),
+        ),
+        Positioned(
+          top: insetSize,
+          left: insetSize,
+          child: GestureDetector(
+            onTap: _toggleColorOnly,
+            child: Container(
+              width: iconSize,
+              height: iconSize,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: _isColorOnly ? Colors.white : Colors.black,
+                  width: buttonBorder,
+                ),
+              ),
+              child: Icon(
+                _isColorOnly ? Icons.color_lens : Icons.format_color_fill,
+                color: _isColorOnly ? Colors.white : Colors.black,
+                size: iconSize * 3 / 4,
               ),
             ),
           ),
