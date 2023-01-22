@@ -56,7 +56,7 @@ class _MyAppState extends State<MyApp> {
 
   void _changeNumber() {
     setState(() {
-      _number = _isSimple ? Random().nextInt(10) : Random().nextInt(100);
+      _number = _isSimple ? Random().nextInt(10) : Random().nextInt(20);
       if (!_isMonochrome) {
         _backgroundColor = _colors[Random().nextInt(_colors.length)];
       }
