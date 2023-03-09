@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:math';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -29,9 +30,11 @@ class _MyAppState extends State<MyApp> {
   int _changeFrequency = 3; // 3 seconds as default
   bool _isColorOnly = false;
   late Timer _timer;
+  late List<Color> _selectedColors;
 
   @override
   void initState() {
+    _selectedColors = List.from(_colors);
     _timer = Timer.periodic(Duration(seconds: _changeFrequency), (_) {
       _changeNumber();
     });
@@ -54,11 +57,32 @@ class _MyAppState extends State<MyApp> {
     Colors.amber,
   ];
 
+  String _get_color_name(Color color) {
+    if (color == Colors.red.shade800) {
+      return "Red";
+    } else if (color == Colors.green) {
+      return "Green";
+    } else if (color == Colors.blue.shade800) {
+      return "Blue";
+    } else if (color == Colors.amber) {
+      return "Yellow";
+    } else {
+      return "Unknown";
+    }
+  }
+
+  void _updateBackgroundColor() {
+    if (_selectedColors.length > 0) {
+      _backgroundColor =
+          _selectedColors[Random().nextInt(_selectedColors.length)];
+    }
+  }
+
   void _changeNumber() {
     setState(() {
       _number = _isSimple ? Random().nextInt(10) : Random().nextInt(20);
       if (!_isMonochrome) {
-        _backgroundColor = _colors[Random().nextInt(_colors.length)];
+        _updateBackgroundColor();
       }
     });
     _timer.cancel();
@@ -68,11 +92,14 @@ class _MyAppState extends State<MyApp> {
   }
 
   void _toggleMonochrome() {
+    if (_isColorOnly) {
+      return;
+    }
     setState(() {
       _isMonochrome = !_isMonochrome;
-      _backgroundColor = _isMonochrome
-          ? Colors.black
-          : _colors[Random().nextInt(_colors.length)];
+      _isMonochrome
+          ? _backgroundColor = Colors.black
+          : _updateBackgroundColor();
     });
   }
 
@@ -97,10 +124,85 @@ class _MyAppState extends State<MyApp> {
   }
 
   void _toggleColorOnly() {
+    if (_isMonochrome) {
+      return;
+    }
     setState(() {
       _isColorOnly = !_isColorOnly;
     });
+
     _changeNumber();
+  }
+
+  void _openColorSelector() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        // Store the state of the checkboxes in the State object of the AlertDialog
+        return StatefulBuilder(
+          builder: (context, setState) => Theme(
+            data: ThemeData(
+              brightness: Brightness.dark,
+            ),
+            child: AlertDialog(
+              backgroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16.0),
+                side: BorderSide(
+                  color: Colors.grey.shade400,
+                  width: 1,
+                ),
+              ),
+              title: Text(
+                'SELECT COLORS',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 1.2,
+                  fontFamily: 'Roboto',
+                  color: Colors.grey.shade800,
+                ),
+              ),
+              content: SingleChildScrollView(
+                child: Column(
+                  children: _colors.map((color) {
+                    return CheckboxListTile(
+                      title: Row(
+                        children: [
+                          CircleAvatar(
+                            backgroundColor: color,
+                            radius: 10.0,
+                          ),
+                          const SizedBox(width: 20.0),
+                          Text(
+                            _get_color_name(color),
+                            style: TextStyle(
+                              color: Colors.grey.shade800,
+                            ),
+                          ),
+                        ],
+                      ),
+                      checkColor: Colors.white,
+                      activeColor: Colors.black54,
+                      value: _selectedColors.contains(color),
+                      onChanged: (selected) {
+                        setState(() {
+                          if (selected!) {
+                            _selectedColors.add(color);
+                          } else {
+                            _selectedColors.remove(color);
+                          }
+                        });
+                        _changeNumber();
+                      },
+                    );
+                  }).toList(),
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+    );
   }
 
   @override
@@ -159,6 +261,29 @@ class _MyAppState extends State<MyApp> {
               _isMonochrome ? Icons.wb_sunny : Icons.brightness_3,
               color: _isMonochrome ? Colors.white : Colors.black,
               size: iconSize,
+            ),
+          ),
+        ),
+        Positioned(
+          top: insetSize,
+          right: insetSize,
+          child: GestureDetector(
+            onTap: _isColorOnly ? _openColorSelector : _toggleMonochrome,
+            child: Container(
+              width: iconSize,
+              height: iconSize,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: _isColorOnly ? Colors.white : Colors.transparent,
+                  width: buttonBorder,
+                ),
+              ),
+              child: Icon(
+                Icons.color_lens,
+                color: _isColorOnly ? Colors.white : Colors.transparent,
+                size: iconSize * 3 / 4,
+              ),
             ),
           ),
         ),
@@ -244,7 +369,7 @@ class _MyAppState extends State<MyApp> {
                 ),
               ),
               child: Icon(
-                _isColorOnly ? Icons.color_lens : Icons.format_color_fill,
+                _isColorOnly ? Icons.numbers : Icons.format_color_fill,
                 color: _isColorOnly ? Colors.white : Colors.black,
                 size: iconSize * 3 / 4,
               ),
